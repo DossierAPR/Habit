@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30 Day Habit Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=DM+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#fff;--ink:#000;--mut:#777;--soft:#ececec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--ink:#fff;--mut:#999;--soft:#1d1d1d}}
+:root[data-theme="dark"]{--bg:#000;--ink:#fff;--mut:#999;--soft:#1d1d1d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;overflow-x:hidden}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;cursor:pointer}
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none}
+main{max-width:1500px;margin:0 auto;padding:24px 16px 70px}
+[hidden]{display:none!important}
+h1,h2,.big{font-family:'Bricolage Grotesque',Georgia,serif;font-weight:800;margin:0}
+h1{font-size:clamp(2.2rem,7vw,5rem);line-height:1;text-align:center;letter-spacing:-.02em}
+h1 span{display:inline-block;transition:transform .5s cubic-bezier(.2,2.2,.4,1)}
+h1 span:hover{transform:translateY(-14px) rotate(-12deg) scale(1.25)}
+.sub{text-align:center;color:var(--mut);font-weight:600;letter-spacing:.2em;font-size:.85rem;margin:12px 0 20px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;justify-content:center;margin-bottom:18px}
+.coins{border:2px solid var(--ink);background:var(--ink);color:var(--bg);padding:10px 22px;display:flex;align-items:center;gap:12px;border-radius:99px}
+.coins .big{font-size:2rem;line-height:1}
+.coin{width:26px;height:26px;border-radius:50%;border:3px solid var(--bg);display:grid;place-items:center;font-weight:800;font-size:.8rem}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab,.btn{border:2px solid var(--ink);background:var(--bg);padding:10px 20px;border-radius:99px;font-weight:600;transition:transform .25s cubic-bezier(.2,2,.4,1),background .2s,color .2s}
+.tab.on{background:var(--ink);color:var(--bg)}
+.btn:active,.tab:active{transform:scale(.9)}
+@media (hover:hover){.tab:hover,.btn:hover{transform:translateY(-3px) scale(1.05)}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{border:2px solid var(--ink);padding:12px 16px;transition:transform .3s cubic-bezier(.2,2,.4,1)}
+@media (hover:hover){.stat:hover{transform:translate(-4px,-4px)}}
+.stat em{font-style:normal;display:block;font-family:'Bricolage Grotesque',Georgia,serif;font-weight:800;font-size:2.2rem;line-height:1.1}
+.stat small{color:var(--mut);font-weight:600}
+.wrap{border:2px solid var(--ink);overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;min-width:1500px;width:100%}
+th,td{padding:0;text-align:center;border-bottom:1px solid var(--ink);border-right:1px solid var(--ink)}
+th{font-size:.72rem;color:var(--mut);padding:9px 2px 8px;font-weight:600;position:relative}
+th b{display:block;font-size:1rem;color:var(--ink)}
+th.ok{background:var(--soft)}
+th.perfect{background:var(--ink);color:var(--bg)}
+th.perfect b{color:var(--bg)}
+.h{position:sticky;left:0;z-index:3;background:var(--bg);text-align:left;padding-left:14px;min-width:170px;font-family:'Bricolage Grotesque',Georgia,serif;font-weight:500}
+th.h{font-size:1.15rem;font-weight:800;color:var(--ink)}
+tr.row:hover td{background:var(--soft)}
+td{height:44px}
+td.p{font-weight:800;font-size:.8rem;min-width:62px}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);background:transparent;position:relative;padding:0;margin:8px;display:inline-grid;place-items:center;transition:transform .3s cubic-bezier(.2,2.4,.4,1);color:var(--bg)}
+.dot:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media (hover:hover){.dot:hover{transform:scale(1.25)}}
+.dot:active{transform:scale(.8)}
+.dot::before{content:"";position:absolute;inset:-2px;border-radius:50%;background:var(--ink);transform:scale(0);transition:transform .15s ease-in;pointer-events:none}
+.dot svg{position:relative;width:15px;height:15px;stroke:currentColor;stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .12s;pointer-events:none}
+.dot.on::before{transform:scale(1);transition:transform .35s cubic-bezier(.2,2.2,.4,1)}
+.dot.on svg{stroke-dashoffset:0;transition:stroke-dashoffset .3s .08s}
+.panel{border:2px solid var(--ink);padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.card{border:2px solid var(--ink);padding:14px;display:flex;flex-direction:column;gap:8px;transition:transform .3s cubic-bezier(.2,2,.4,1)}
+@media (hover:hover){.card:hover{transform:translate(-4px,-4px)}}
+.card.lock{opacity:.45}
+.card.got{background:var(--ink);color:var(--bg)}
+.card h2{font-size:1.1rem}
+.card .price{font-weight:800;font-size:1.4rem}
+.card .btn{padding:8px 14px;margin-top:auto}
+.card.got .btn{border-color:var(--bg);background:transparent}
+.strip{display:grid;grid-template-columns:repeat(15,1fr);gap:6px}
+.strip i{aspect-ratio:1;border:2px solid var(--ink);display:grid;place-items:center;font-style:normal;font-size:.7rem;font-weight:800}
+.strip i.ok{background:var(--ink);color:var(--bg)}
+.hint{color:var(--mut);font-size:.9rem;margin:6px 0 0}
+.tools{display:flex;gap:10px;justify-content:center;margin-top:22px}
+.float,.ring{position:fixed;pointer-events:none;z-index:60}
+.float{font-family:'Bricolage Grotesque',Georgia,serif;font-weight:800;font-size:1.3rem;color:var(--ink);text-shadow:0 0 6px var(--bg),0 0 6px var(--bg)}
+.ring{width:20px;height:20px;border-radius:50%;border:3px solid var(--ink)}
+.shake{animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(3px)}}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,220%);background:var(--ink);color:var(--bg);font-weight:800;padding:13px 24px;border-radius:99px;z-index:70;transition:transform .5s cubic-bezier(.2,1.8,.4,1);white-space:nowrap}
+.toast.show{transform:translate(-50%,0)}
+.badge{text-align:center;font-family:'Bricolage Grotesque',Georgia,serif;font-weight:800;letter-spacing:.25em;margin:-8px 0 16px}
+.pickbar{position:sticky;top:8px;z-index:40;display:flex;gap:12px;align-items:center;justify-content:center;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;margin-bottom:14px;font-weight:600}
+.pickbar .btn{padding:4px 14px;background:var(--bg);color:var(--ink);border-color:var(--bg)}
+body.picking th[data-d]{cursor:pointer;outline:2px dashed var(--ink);outline-offset:-3px}
+th.f b::after{content:" F"}th.x2 b::after{content:" x2"}th.pb b::after{content:" *"}
+.card p{margin:0;opacity:.75;font-size:.85rem}
+.card .btn:disabled{opacity:.6;cursor:default}
+.months{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.months .tab,.months .btn{padding:6px 14px;font-size:.9rem}
+.tab:disabled{opacity:.35;cursor:default;transform:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<main id="app">
+  <h1 id="title" aria-label="30 Day Habit Tracker"></h1>
+  <div class="sub">SMALL STEPS = BIG CHANGES</div>
+  <div class="months" id="months"></div>
+  <p class="hint" id="mnote" style="text-align:center;margin:-6px 0 16px"></p>
+  <div class="badge" id="badge" hidden>&#9733; CHAMPION &#9733;</div>
+  <div class="top">
+    <div class="coins"><div class="coin">$</div><span class="big" id="bal">0</span><span>coins</span></div>
+    <div class="tabs">
+      <button type="button" class="tab on" data-tab="tracker">Tracker</button>
+      <button type="button" class="tab" data-tab="streaks">Streaks</button>
+      <button type="button" class="tab" data-tab="shop">Shop</button>
+    </div>
+  </div>
+
+  <div class="pickbar" id="pickbar" hidden><span id="picktxt"></span><button type="button" class="btn" data-act="cancel">Cancel</button></div>
+
+  <section id="tracker">
+    <div class="stats">
+      <div class="stat"><small>Overall</small><em id="s1">0%</em></div>
+      <div class="stat"><small>Circles done</small><em id="s2">0</em></div>
+      <div class="stat"><small>Perfect days</small><em id="s3">0</em></div>
+      <div class="stat"><small>Current streak</small><em id="s4">0</em></div>
+    </div>
+    <div class="wrap"><table id="t"></table></div>
+    <p class="hint">+10 coins for every circle (more with upgrades). +50 bonus for a perfect day. Unchecking takes the coins back.</p>
+  </section>
+
+  <section id="streaks" hidden>
+    <div class="stats">
+      <div class="stat"><small>Current streak (days)</small><em id="k1">0</em></div>
+      <div class="stat"><small>Best streak (days)</small><em id="k2">0</em></div>
+      <div class="stat"><small>Streak bonus earned</small><em id="k3">0</em></div>
+    </div>
+    <div class="panel"><h2 id="mhead">Your 30 days</h2>
+      <p class="hint">A day counts toward your streak when you tick at least <b id="mind">6</b> circles that day.</p><br>
+      <div class="strip" id="strip"></div></div>
+    <div class="panel"><h2>Milestones</h2><br><div class="grid" id="miles"></div></div>
+  </section>
+
+  <section id="shop" hidden>
+    <div class="panel"><h2>Shop</h2><p class="hint">Spend coins on power-ups and upgrades for this game. Consumables go to your bag; upgrades stay on forever.</p><br><div class="grid" id="items"></div></div>
+    <div class="panel"><h2>Your bag</h2><br><div class="grid" id="bag"></div></div>
+  </section>
+
+  <div class="tools">
+    <button type="button" class="btn" data-act="theme">Switch theme</button>
+    <button type="button" class="btn" data-act="reset" id="reset">Reset everything</button>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const HABITS=["Pushups","Mountain Climbers","Jumping Jacks","Squats","Math","Phy","Homework","School","Bag Lift","AE Edit","Chess","Duolingo","Running","Quran","Photography","Shower","Save 100 PKR","Other / Notes"];
+const DAYS=30,MONTHS=12,WK=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],COIN=10,PERFECT=50,MINDAY=6;
+const MILES=[[3,30],[7,100],[14,250],[21,400],[30,1000],[60,2000],[90,3000],[180,6000],[360,15000]];
+const ITEMS=[
+["freeze","Streak Freeze",150,"c","Protects one day so it still counts toward your streak. Use it, then tap the day.",1],
+["double","Double Coins Day",200,"c","Pick a day: every circle ticked that day pays double.",1],
+["boost","Perfect Day Boost",300,"c","Pick a day: its perfect-day bonus is doubled.",1],
+["chest","Lucky Chest",100,"c","Open it for a random 40 to 160 coins."],
+["magnet","Coin Magnet",400,"p","Upgrade: +3 coins on every circle, forever."],
+["easy","Easy Streaks",600,"p","Upgrade: a streak day needs only 5 circles instead of 6."],
+["miles","Milestone Booster",700,"p","Upgrade: streak milestone bonuses are 50% bigger."],
+["fx","Mega Confetti",250,"p","Upgrade: much bigger celebration bursts."],
+["title","Champion Title",350,"p","Upgrade: shows a champion badge under the title."]];
+const IT={};ITEMS.forEach(([id,n,p,t,d,day])=>IT[id]={id,n,p,t,d,day});
+const K1="habit30-v1",K2="habit30-shop-v2",K3="habit30-ui",K4="habit30-meta";
+const K=(m,r,d)=>m===0?r+","+d:m+":"+r+","+d;
+// ---- saving: localStorage first, window.name as a backup so a refresh never wipes progress ----
+const mem={};
+try{const w=JSON.parse(window.name||"{}");if(w&&typeof w==="object")Object.assign(mem,w)}catch(e){}
+function wr(k,v){const s=JSON.stringify(v);mem[k]=s;try{localStorage.setItem(k,s)}catch(e){}try{window.name=JSON.stringify(mem)}catch(e){}}
+function rd(k){let v=null;try{v=localStorage.getItem(k)}catch(e){}if(v==null)v=mem[k]??null;try{return v?JSON.parse(v):null}catch(e){return null}}
+const freshSH=()=>({b:{},u:{},chest:0,d:{freeze:{},double:{},boost:{}}});
+function fixSH(o){o=Object.assign(freshSH(),o||{});["freeze","double","boost"].forEach(k=>o.d[k]=o.d[k]||{});return o}
+let S=rd(K1)||{},SH=fixSH(rd(K2)),ui=rd(K3)||{};
+const has=id=>(SH.b[id]||0)>0;
+let M=rd(K4)||{};if(!M.start)M.start=Date.now();M.unl=M.unl||1;
+const unl=()=>Math.min(MONTHS,Math.max(M.unl||1,1+Math.floor((Date.now()-M.start)/864e5/30)));
+let vm=Math.min(M.view||0,unl()-1);wr(K4,M);
+function setMonth(i){vm=i;M.view=i;wr(K4,M);buildTable();render();scrollTo({top:0,behavior:"smooth"})}
+const save=()=>{wr(K1,S);wr(K2,SH);wr(K4,M)};
+addEventListener("pagehide",save);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
+let pick=null;
+function showTab(t){if(!$(t))t="tracker";document.querySelectorAll(".tabs .tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+  ["tracker","streaks","shop"].forEach(x=>$(x).hidden=x!==t);ui.tab=t;wr(K3,ui)}
+function startPick(id){pick=id;showTab("tracker");document.body.classList.add("picking");$("picktxt").textContent="Tap a day number to use "+IT[id].n;$("pickbar").hidden=false;scrollTo({top:0,behavior:"smooth"})}
+function endPick(){pick=null;document.body.classList.remove("picking");$("pickbar").hidden=true}
+function applyDay(d){d=vm*DAYS+d;const m=SH.d[pick];if(m[d]){say("That day already has it");return}
+  m[d]=1;SH.u[pick]=(SH.u[pick]||0)+1;const n=IT[pick].n;endPick();save();render();say(n+" applied")}
+try{const th=localStorage.getItem("habit30-theme-bw");if(th)document.documentElement.dataset.theme=th}catch(e){}
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+$("title").innerHTML="30 DAY HABIT TRACKER".split("").map(c=>`<span>${c===" "?"&nbsp;":c}</span>`).join("");
+let dots=[];
+function buildTable(){
+let h='<thead><tr><th class="h">HABIT</th>';
+for(let d=1;d<=DAYS;d++)h+=`<th data-d="${d}">${d}<b>${WK[(vm*DAYS+d-1)%7]}</b></th>`;
+h+='<th>Best run</th></tr></thead><tbody>';
+HABITS.forEach((n,r)=>{h+=`<tr class="row"><td class="h">${n}</td>`;
+  for(let d=1;d<=DAYS;d++)h+=`<td><button type="button" class="dot" data-r="${r}" data-d="${d}" aria-label="${n}, month ${vm+1} day ${d}" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></button></td>`;
+  h+=`<td class="p" data-p="${r}">0</td></tr>`});
+$("t").innerHTML=h+"</tbody>";dots=[...document.querySelectorAll(".dot")];}
+
+// ---- game maths (everything derived from saved state) ----
+function calc(){
+  const mind=has("easy")?5:6,cp=COIN+(has("magnet")?3:0),mm=has("miles")?1.5:1,N=DAYS*MONTHS,H=HABITS.length;
+  const c=Array(N+1).fill(0),q=Array(N+1).fill(false),rowBest=Array(H).fill(0);let checks=0,mChecks=0;
+  for(let m=0;m<MONTHS;m++)for(let r=0;r<H;r++){let run=0;
+    for(let d=1;d<=DAYS;d++){if(S[K(m,r,d)]){c[m*DAYS+d]++;checks++;if(m===vm){mChecks++;run++;rowBest[r]=Math.max(rowBest[r],run)}}else run=0}}
+  let perfect=0,mPerfect=0,run=0,best=0,cur=0,extra=0;
+  for(let g=1;g<=N;g++){if(c[g]===H){perfect++;if(Math.ceil(g/DAYS)-1===vm)mPerfect++;if(SH.d.boost[g])extra+=PERFECT}
+    if(SH.d.double[g])extra+=c[g]*cp;
+    q[g]=c[g]>=mind||!!SH.d.freeze[g];
+    if(q[g]){run++;best=Math.max(best,run);cur=run}else run=0}
+  const bonus=Math.round(MILES.reduce((a,[m,b])=>a+(best>=m?b:0),0)*mm);
+  const earned=checks*cp+perfect*PERFECT+extra+bonus+SH.chest;
+  const spent=ITEMS.reduce((a,[id,,p])=>a+p*(SH.b[id]||0),0);
+  return {c,q,mind,mm,rowBest,checks,mChecks,perfect,mPerfect,best,cur,bonus,earned,spent,bal:earned-spent};
+}
+// ---- animated counters ----
+const cur={},raf={};
+function num(id,to,suf=""){const el=$(id),from=cur[id]||0;cur[id]=to;
+  if(from===to){el.textContent=to+suf;return}
+  cancelAnimationFrame(raf[id]);const t0=performance.now();
+  (function f(n){const k=Math.min(1,(n-t0)/600);el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-k,3)))+suf;if(k<1)raf[id]=requestAnimationFrame(f)})(t0);
+  el.animate([{transform:"scale(1.3)"},{transform:"scale(1)"}],{duration:400,easing:"ease-out"});}
+
+function render(){
+  const g=calc();
+  dots.forEach(b=>{const on=!!S[K(vm,+b.dataset.r,+b.dataset.d)];b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});
+  document.querySelectorAll("th[data-d]").forEach(th=>{const d=vm*DAYS+(+th.dataset.d);th.classList.toggle("perfect",g.c[d]===HABITS.length);th.classList.toggle("ok",g.q[d]&&g.c[d]<HABITS.length);th.classList.toggle("f",!!SH.d.freeze[d]);th.classList.toggle("x2",!!SH.d.double[d]);th.classList.toggle("pb",!!SH.d.boost[d])});
+  document.querySelectorAll("[data-p]").forEach(el=>el.textContent=g.rowBest[el.dataset.p]+"d");
+  num("bal",g.bal);num("s1",Math.round(g.mChecks/(DAYS*HABITS.length)*100),"%");num("s2",g.mChecks);num("s3",g.mPerfect);num("s4",g.cur);
+  num("k1",g.cur);num("k2",g.best);num("k3",g.bonus);
+  $("strip").innerHTML=Array.from({length:DAYS},(_,i)=>`<i class="${g.q[vm*DAYS+i+1]?"ok":""}">${i+1}</i>`).join("");
+  $("miles").innerHTML=MILES.map(([m,b])=>{const ok=g.best>=m;return `<div class="card ${ok?"got":"lock"}"><h2>${m} day streak</h2><div class="price">+${Math.round(b*g.mm)} coins</div><span>${ok?"Unlocked":"Locked: "+Math.max(0,m-g.best)+" more days"}</span></div>`}).join("");
+  $("items").innerHTML=ITEMS.map(([id,n,p,t,d])=>{const own=t==="p"&&has(id),lk=!own&&g.bal<p;
+    return `<div class="card ${own?"got":lk?"lock":""}"><h2>${n}</h2><p>${d}</p><div class="price">${p} coins</div><button type="button" class="btn" data-buy="${id}" ${own?"disabled":""}>${own?"Owned":lk?"Need "+(p-g.bal):"Buy"}</button></div>`}).join("");
+  const bag=ITEMS.filter(([id,,,t])=>t==="c"&&(SH.b[id]||0)-(SH.u[id]||0)>0).map(([id,n,,,d])=>`<div class="card got"><h2>${n}</h2><p>${d}</p><div class="price">x${SH.b[id]-(SH.u[id]||0)}</div><button type="button" class="btn" data-use="${id}">Use</button></div>`);
+  const perks=ITEMS.filter(([id,,,t])=>t==="p"&&has(id)).map(([id,n,,,d])=>`<div class="card got"><h2>${n}</h2><p>${d}</p><div class="price">Active</div></div>`);
+  const all=bag.concat(perks);
+  $("bag").innerHTML=all.length?all.join(""):'<p class="hint">Nothing here yet. Earn coins, then buy a power-up.</p>';
+  const un=unl();
+  $("months").innerHTML=Array.from({length:MONTHS},(_,i)=>`<button type="button" class="tab ${i===vm?"on":""}" data-month="${i}" ${i>=un?"disabled":""}>Month ${i+1}</button>`).join("")+(un<MONTHS?'<button type="button" class="btn" data-act="nextmonth">Start next month early</button>':"");
+  const left=Math.max(0,Math.ceil((M.start+un*30*864e5-Date.now())/864e5));
+  $("mnote").textContent=un<MONTHS?"Month "+(un+1)+" unlocks automatically in "+left+" day"+(left===1?"":"s")+". Coins, items and streaks carry over.":"All 12 months are unlocked. Finish the year strong!";
+  $("mhead").textContent="Month "+(vm+1)+" of 12: your 30 days";
+  $("badge").hidden=!has("title");$("mind").textContent=g.mind;
+  return g;
+}
+
+// ---- effects (only on interaction) ----
+const cv=$("fx"),cx=cv.getContext("2d");let P=[],loop=0;
+function fit(){cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+fit();addEventListener("resize",fit);
+function burst(x,y,n=30,pow=1){if(has("fx")){n*=2;pow*=1.2}for(let i=0;i<n;i++){const a=Math.random()*6.283,v=(2+Math.random()*6)*pow;
+  P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-2,l:1,s:3+Math.random()*5,w:i%2===0,r:Math.random()*6,vr:(Math.random()-.5)*.4,sq:Math.random()<.5})}
+  if(!loop)loop=requestAnimationFrame(tick)}
+function tick(){cx.clearRect(0,0,innerWidth,innerHeight);P=P.filter(p=>p.l>0);const ink=css("--ink"),bg=css("--bg");
+  for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.vx*=.985;p.l-=.012;p.r+=p.vr;
+    cx.globalAlpha=Math.max(p.l,0);cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.w?ink:bg;cx.strokeStyle=ink;cx.lineWidth=1.5;
+    if(p.sq){cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.5);cx.strokeRect(-p.s/2,-p.s/2,p.s,p.s*.5)}else{cx.beginPath();cx.arc(0,0,p.s/2,0,6.283);cx.fill();cx.stroke()}cx.restore()}
+  loop=P.length?requestAnimationFrame(tick):0;if(!loop)cx.clearRect(0,0,innerWidth,innerHeight)}
+function ripple(x,y){for(let i=0;i<3;i++){const r=document.createElement("div");r.className="ring";r.style.left=x-10+"px";r.style.top=y-10+"px";document.body.appendChild(r);
+  r.animate([{transform:"scale(1)",opacity:.9},{transform:`scale(${8+i*4})`,opacity:0}],{duration:700+i*200,delay:i*80,easing:"ease-out",fill:"backwards"}).onfinish=()=>r.remove()}}
+function floaty(x,y,txt){const f=document.createElement("div");f.className="float";f.textContent=txt;f.style.left=x-14+"px";f.style.top=y-14+"px";document.body.appendChild(f);
+  f.animate([{transform:"translateY(0) scale(.6)",opacity:0},{transform:"translateY(-20px) scale(1.3)",opacity:1,offset:.25},{transform:"translateY(-70px) scale(1)",opacity:0}],{duration:900,easing:"ease-out"}).onfinish=()=>f.remove()}
+let tm;function say(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tm);tm=setTimeout(()=>t.classList.remove("show"),2400)}
+function shake(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}
+
+// ---- one delegated handler for every button ----
+let armed=0,rt;
+document.addEventListener("click",e=>{
+  const mo=e.target.closest("[data-month]");if(mo&&!mo.disabled){setMonth(+mo.dataset.month);return}
+  if(pick){const th=e.target.closest("th[data-d]");if(th){applyDay(+th.dataset.d);return}}
+  const dot=e.target.closest(".dot"),tab=e.target.closest("[data-tab]"),buy=e.target.closest("[data-buy]"),use=e.target.closest("[data-use]"),act=e.target.closest("[data-act]");
+  if(dot){
+    const r=+dot.dataset.r,d=+dot.dataset.d,k=K(vm,r,d),rc=dot.getBoundingClientRect(),x=rc.left+rc.width/2,y=rc.top+rc.height/2,before=calc();
+    if(S[k]){delete S[k];
+      if(calc().bal<0){S[k]=1;say("You already spent those coins");shake(dot);return}
+      save();render();floaty(x,y,""+(calc().bal-before.bal));burst(x,y,6,.4);return}
+    S[k]=1;save();const g=render();
+    floaty(x,y,"+"+(g.bal-before.bal));burst(x,y,28);ripple(x,y);
+    if(g.perfect>before.perfect){burst(x,y,90,1.5);say("Perfect day "+d+": +"+PERFECT+" coins")}
+    const m=MILES.find(([n])=>g.best>=n&&before.best<n);
+    if(m){burst(innerWidth/2,innerHeight/3,140,1.8);say(m[0]+" day streak: +"+Math.round(m[1]*g.mm)+" coins")}
+    return}
+  if(tab){showTab(tab.dataset.tab);return}
+  if(buy){const id=buy.dataset.buy,it=IT[id],g=calc();
+    if(it.t==="p"&&has(id))return;
+    if(g.bal<it.p){say("Need "+(it.p-g.bal)+" more coins");shake(buy);return}
+    SH.b[id]=(SH.b[id]||0)+1;save();const rc=buy.getBoundingClientRect();render();burst(rc.left+rc.width/2,rc.top,50,1.2);say("Bought: "+it.n);return}
+  if(use){const id=use.dataset.use,it=IT[id];if((SH.b[id]||0)-(SH.u[id]||0)<=0)return;
+    if(it.day){startPick(id);return}
+    SH.u[id]=(SH.u[id]||0)+1;
+    if(id==="chest"){const w=40+Math.floor(Math.random()*121);SH.chest+=w;save();render();burst(innerWidth/2,innerHeight/3,80,1.4);say("Lucky Chest: +"+w+" coins");return}
+    save();render();return}
+  if(act){const a=act.dataset.act;
+    if(a==="cancel")endPick();
+    if(a==="nextmonth"){if(unl()>=MONTHS)return;M.unl=unl()+1;wr(K4,M);say("Month "+M.unl+" unlocked");setMonth(M.unl-1);return}
+    if(a==="theme"){const el=document.documentElement,dark=(el.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark";
+      el.dataset.theme=dark?"light":"dark";try{localStorage.setItem("habit30-theme-bw",el.dataset.theme)}catch(x){}}
+    if(a==="reset"){
+      if(!armed){armed=1;act.textContent="Tap again to reset";clearTimeout(rt);rt=setTimeout(()=>{armed=0;act.textContent="Reset everything"},3000);return}
+      armed=0;clearTimeout(rt);act.textContent="Reset everything";S={};SH=freshSH();M={start:Date.now(),unl:1,view:0};vm=0;buildTable();endPick();save();render();shake($("app"));say("Fresh start")}
+  }
+});
+buildTable();render();showTab(ui.tab||"tracker");
+</script>
+</body>
+</html>
